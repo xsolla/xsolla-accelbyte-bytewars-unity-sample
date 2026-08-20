@@ -1,0 +1,132 @@
+// Copyright (c) 2026 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
+
+using System;
+using System.Linq;
+using UnityEngine;
+using Xsolla.Core;
+
+public class XsollaWebshopWrapper : MonoBehaviour
+{
+    // Storefronts, matching the Unreal implementation.
+    private const string PublishedWebShopUrl = "https://bytewars.xsolla.site/";
+    private const string PreviewWebShopUrl = "https://sitebuilder.xsolla.com/preview/bytewars/";
+
+    // Launch arguments kept spelled exactly as in Unreal so existing QA scripts transfer.
+    private const string PreviewStoreArg = "-bUsePreviewStore=";
+    private const string ExternalBrowserArg = "-bUseExternalBrowser=";
+
+    private IInAppBrowser activeBrowser;
+    private XsollaWebshopDomainGuard domainGuard;
+
+    /* Browser events are raised by the in-app browser, which is not guaranteed to be on the main thread.
+     * Messages are queued here and shown from Update, where Unity API calls are safe. */
+    private volatile string pendingErrorMessage;
+
+    private void Update()
+    {
+        if (string.IsNullOrEmpty(pendingErrorMessage))
+        {
+            return;
+        }
+
+        string message = pendingErrorMessage;
+        pendingErrorMessage = null;
+        MenuManager.Instance.ShowInfo(message, "Web Shop");
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeBrowser();
+    }
+
+    public void OpenWebShop()
+    {
+        /* Unreal dereferences its Xsolla login data without a null check here, which crashes when the
+         * player signed in with something other than an Xsolla account. Fail with a message instead. */
+        string accessToken = AccelByteWarsOnlineUtility.GetXsollaAccessToken();
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            BytewarsLogger.LogWarning("Unable to open the web shop. No Xsolla access token is available.");
+            MenuManager.Instance.ShowInfo(
+                "Please sign in with an Xsolla account to open the web shop.", "Web Shop");
+            return;
+        }
+
+        string storeUrl = GetBoolLaunchArg(PreviewStoreArg) ? PreviewWebShopUrl : PublishedWebShopUrl;
+        string url = $"{storeUrl}?token={accessToken}";
+
+        // Log the storefront only. The full URL carries the access token.
+        BytewarsLogger.Log($"Opening the web shop at {storeUrl}");
+
+        if (GetBoolLaunchArg(ExternalBrowserArg))
+        {
+            XsollaWebBrowser.Open(url, forcePlatformBrowser: true);
+            return;
+        }
+
+        /* Null when the in-app browser is turned off in XsollaSettings, or on a platform it does not
+         * support. The platform browser is the only remaining way to reach the storefront. */
+        IInAppBrowser browser = XsollaWebBrowser.InAppBrowser;
+        if (browser == null)
+        {
+            BytewarsLogger.LogWarning("The in-app browser is unavailable. Using the platform browser instead.");
+            XsollaWebBrowser.Open(url, forcePlatformBrowser: true);
+            return;
+        }
+
+        // Built per open, so the allowed domain of one web shop session never carries into the next.
+        UnsubscribeBrowser();
+        domainGuard = new XsollaWebshopDomainGuard(storeUrl);
+        activeBrowser = browser;
+        activeBrowser.AddNavigationInterceptor(domainGuard);
+        activeBrowser.CloseEvent += OnBrowserClosed;
+
+        XsollaWebBrowser.Open(url);
+    }
+
+    private void OnBrowserClosed(BrowserCloseInfo closeInfo)
+    {
+        bool wasNavigationBlocked = domainGuard != null && domainGuard.HasBlockedNavigation;
+        string allowedHost = domainGuard?.AllowedHost;
+
+        UnsubscribeBrowser();
+
+        if (wasNavigationBlocked)
+        {
+            pendingErrorMessage =
+                $"An external link was blocked.\n\nOnly {allowedHost} can be opened in the in-game browser.";
+        }
+
+        /* Unreal always re-runs its shop refresh here so items bought on the storefront appear in-game.
+         * Unity ByteWars has no in-game store to refresh, so there is nothing to call yet. */
+    }
+
+    private void UnsubscribeBrowser()
+    {
+        if (activeBrowser != null)
+        {
+            if (domainGuard != null)
+            {
+                activeBrowser.RemoveNavigationInterceptor(domainGuard);
+            }
+
+            activeBrowser.CloseEvent -= OnBrowserClosed;
+            activeBrowser = null;
+        }
+
+        domainGuard = null;
+    }
+
+    // Reads Unreal-style "-bSomeFlag=true" launch arguments.
+    private static bool GetBoolLaunchArg(string argPrefix)
+    {
+        string arg = Environment.GetCommandLineArgs()
+            .FirstOrDefault(cmdArg => cmdArg.StartsWith(argPrefix, StringComparison.OrdinalIgnoreCase));
+
+        return arg != null
+            && bool.TryParse(arg.Substring(argPrefix.Length), out bool isEnabled)
+            && isEnabled;
+    }
+}

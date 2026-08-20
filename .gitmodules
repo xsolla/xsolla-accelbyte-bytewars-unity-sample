@@ -1,0 +1,3 @@
+[submodule "local-packages/XsollaSDK"]
+	path = local-packages/XsollaSDK
+	url = https://github.com/xsolla/xsolla-accelbyte-services-unity-sdk.git

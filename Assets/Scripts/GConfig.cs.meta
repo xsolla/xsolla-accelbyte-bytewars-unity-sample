@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/GConfig.cs.meta
+guid: 29cdbeb152cb6f242bdea56d1993b774
+========
+guid: adfd17ef04ad55d4981c22719d117e80
+>>>>>>>> tutorialmodules:Assets/Scripts/GameManager/GameConstant.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

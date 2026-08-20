@@ -1,0 +1,7 @@
+*.prefab text eol=lf
+Assets/Plugins/BlackBoxUnitySDK/**/*.a filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/BlackBoxUnitySDK/**/*.so filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/BlackBoxUnitySDK/**/*.dylib filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/BlackBoxUnitySDK/**/*.dll filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/BlackBoxUnitySDK/**/*.lib filter=lfs diff=lfs merge=lfs -text
+Assets/StreamingAssets/BlackBox/**/*.exe filter=lfs diff=lfs merge=lfs -text
