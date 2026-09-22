@@ -20,10 +20,4 @@ public static class AccelByteWarsOnlineUtility
         !string.IsNullOrEmpty(userInfo.displayName) ? userInfo.displayName :
         !string.IsNullOrEmpty(userInfo.UniqueDisplayName) ? userInfo.UniqueDisplayName :
         AccelByteWarsUtility.GetDefaultDisplayNameByUserId(userInfo.userId);
-
-    /* Xsolla access token of the signed in player, used to authenticate them on the Xsolla web shop.
-     * This is the Xsolla token, not the AGS one. The Xsolla SDK owns it, so it is read on demand rather
-     * than cached at login: every login path the game uses (the Xsolla login widget and Steam silent
-     * auth) builds its result from this same value. Null or empty until an Xsolla login succeeds. */
-    public static string GetXsollaAccessToken() => Xsolla.Core.XsollaToken.AccessToken;
 }

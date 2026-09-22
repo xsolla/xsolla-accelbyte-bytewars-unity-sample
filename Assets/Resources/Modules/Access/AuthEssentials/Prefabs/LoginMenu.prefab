@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainButtonsContainer: {fileID: 5293826100510745262}
+  generatedWidgetContainers: []
   widgetSwitcher: {fileID: 5625135745321050620}
   loginWithDeviceIdButton: {fileID: 7764616707719517455}
   loginWithSinglePlatformAuthButton: {fileID: 5603636566193600255}
@@ -1651,27 +1652,27 @@ PrefabInstance:
     - target: {fileID: 940215663889083254, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215663889083254, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215663889083254, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 357.15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215663889083254, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 186.575
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215663889083254, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215663889083257, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
@@ -1697,11 +1698,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LoginWithDeviceIdButton
-      objectReference: {fileID: 0}
-    - target: {fileID: 940215664547834096, guid: 0f3d27981f003474aba828ef0603b723,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215664547834099, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
@@ -1746,7 +1742,7 @@ PrefabInstance:
     - target: {fileID: 940215664547834099, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 50
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 940215664547834099, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
@@ -1786,7 +1782,7 @@ PrefabInstance:
     - target: {fileID: 940215664547834099, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 533.1046
+      value: 593.31586
       objectReference: {fileID: 0}
     - target: {fileID: 940215664547834099, guid: 0f3d27981f003474aba828ef0603b723,
         type: 3}

@@ -130,4 +130,5 @@ public enum AssetEnum
 	StatsProfileMenu_Starter,
 	TutorialModuleConfig,
 	XsollaAuthAssetConfig,
+	XsollaWebshopAssetConfig,
 }

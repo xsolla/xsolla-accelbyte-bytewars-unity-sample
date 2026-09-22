@@ -6,6 +6,7 @@ using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
+using EntityId = AccelByte.Models.EntityId;
 
 public class GameTelemetryWrapper : MonoBehaviour
 {

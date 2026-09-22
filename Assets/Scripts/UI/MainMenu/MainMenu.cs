@@ -5,6 +5,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
@@ -12,76 +13,27 @@ using System;
 public class MainMenu : MenuCanvas
 {
     [SerializeField] private Button playButton;
-    [SerializeField] private Button playOnlineBtn;
-    [SerializeField] private Button profileButton;
-    [SerializeField] private Button leaderboardButton;
-    [SerializeField] private Button challengeButton;
-    [SerializeField] private Button webShopButton;
-    [SerializeField] private Button socialButton;
     [SerializeField] private Button helpAndOptionsButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private ScrollRect buttonsScrollRect;
     
     public static event Action<Action> OnQuitPressed;
 
+    private void OnEnable()
+    {
+        StartCoroutine(ScrollButtonsToTop());
+    }
+
     private void Start()
     {
-        CheckModulesButtons();
-
         playButton.onClick.AddListener(OnPlayButtonPressed);
-        playOnlineBtn.onClick.AddListener(OnPlayOnlineButtonPressed);
-        leaderboardButton.onClick.AddListener(OnLeaderboardButtonPressed);
-        challengeButton.onClick.AddListener(OnChallengeButtonPressed);
-        webShopButton.onClick.AddListener(OnWebShopButtonPressed);
-        profileButton.onClick.AddListener(OnProfileButtonPressed);
-        socialButton.onClick.AddListener(OnSocialButtonPressed);
         helpAndOptionsButton.onClick.AddListener(OnHelpAndOptionsButtonPressed);
         quitButton.onClick.AddListener(OnQuitButtonPressed);
     }
 
-    private static void OnSocialButtonPressed()
-    {
-        ModuleModel friendsEssentialModule = TutorialModuleManager.Instance.GetModule(TutorialType.FriendsEssentials);
-
-        MenuManager.Instance.ChangeToMenu(friendsEssentialModule.isStarterActive 
-            ? AssetEnum.SocialMenu_Starter : AssetEnum.SocialMenu);
-    }
-    
     private static void OnPlayButtonPressed()
     {
         MenuManager.Instance.ChangeToMenu(AssetEnum.PlayMenuCanvas);
-    }
-
-    private static void OnPlayOnlineButtonPressed()
-    {
-        MenuManager.Instance.ChangeToMenu(AssetEnum.PlayOnlineMenuCanvas);
-    }
-    
-    private static void OnLeaderboardButtonPressed()
-    {
-        MenuManager.Instance.ChangeToMenu(AssetEnum.LeaderboardsMenu);
-    }
-    
-    private static void OnChallengeButtonPressed()
-    {
-        MenuManager.Instance.ChangeToMenu(AssetEnum.ChallengePeriodMenu);
-    }
-
-    private static void OnWebShopButtonPressed()
-    {
-        // The web shop opens a browser instead of a menu, so the module wrapper handles it.
-        XsollaWebshopWrapper webShopWrapper = TutorialModuleManager.Instance.GetModuleClass<XsollaWebshopWrapper>();
-        if (webShopWrapper == null)
-        {
-            BytewarsLogger.LogWarning("Unable to open the web shop. The web shop module is not active.");
-            return;
-        }
-
-        webShopWrapper.OpenWebShop();
-    }
-
-    private static void OnProfileButtonPressed()
-    {
-        MenuManager.Instance.ChangeToMenu(AssetEnum.ProfileMenu);
     }
     
     private static void OnHelpAndOptionsButtonPressed()
@@ -130,29 +82,22 @@ public class MainMenu : MenuCanvas
         return AssetEnum.MainMenuCanvas;
     }
 
-    private void CheckModulesButtons()
+    private IEnumerator ScrollButtonsToTop()
     {
-#if !BYTEWARS_DEBUG
-        bool isOnlineBtnActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.MatchmakingEssentials)
-                                 || TutorialModuleManager.Instance.IsModuleActive(TutorialType.MatchSessionEssentials)
-                                 || TutorialModuleManager.Instance.IsModuleActive(TutorialType.SessionEssentials);
-        playOnlineBtn.gameObject.SetActive(isOnlineBtnActive);
-#endif
+        yield return new WaitForEndOfFrame();
 
-        bool isFriendModuleActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.FriendsEssentials);
-        socialButton.gameObject.SetActive(isFriendModuleActive);
+        if (buttonsScrollRect == null)
+        {
+            yield break;
+        }
 
-        bool isStatsModuleActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.StatsEssentials);
-        profileButton.gameObject.SetActive(isStatsModuleActive);
+        Canvas.ForceUpdateCanvases();
+        if (buttonsScrollRect.content != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(buttonsScrollRect.content);
+        }
+        Canvas.ForceUpdateCanvases();
 
-        bool isLeaderboardModuleActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.LeaderboardEssentials);
-        leaderboardButton.gameObject.SetActive(isLeaderboardModuleActive);
-
-        bool isChallengeModuleActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.ChallengeEssentials);
-        challengeButton.gameObject.SetActive(isChallengeModuleActive);
-
-        bool isWebShopModuleActive = TutorialModuleManager.Instance.IsModuleActive(TutorialType.XsollaWebshop);
-        webShopButton.gameObject.SetActive(isWebShopModuleActive);
+        buttonsScrollRect.verticalNormalizedPosition = 1f;
     }
 }
-

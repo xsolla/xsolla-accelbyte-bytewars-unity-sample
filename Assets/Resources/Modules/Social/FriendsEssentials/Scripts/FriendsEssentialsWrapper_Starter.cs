@@ -9,6 +9,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
 using UnityEngine.Rendering;
+using SearchType = AccelByte.Models.SearchType;
 
 public class FriendsEssentialsWrapper_Starter : MonoBehaviour
 {

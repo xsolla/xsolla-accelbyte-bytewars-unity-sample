@@ -82,12 +82,13 @@ public class TutorialModuleManager : MonoBehaviour
         new Dictionary<TutorialType, ModuleModel>();
     public Dictionary<TutorialType, ModuleModel> GetAllActiveModule() 
     {
+        activeModules.Clear();
         if (AssetManager.Singleton)
         {
             var tutorialModules = AssetManager.Singleton.GetTutorialModules();
             foreach (var tModule in tutorialModules)
             {
-                if (tModule.Value.isActive)
+                if (IsModuleActiveWithDependencies(tModule.Value))
                 {
                     var module = IsStarterActive(tModule.Value);
                     activeModules.TryAdd(module.type, module);
@@ -260,7 +261,7 @@ public class TutorialModuleManager : MonoBehaviour
     {
         var result = new Dictionary<string, string>();
 
-        foreach (var moduleData in tutorialModules.Values.Where(moduleData => moduleData.isActive))
+        foreach (var moduleData in tutorialModules.Values.Where(IsModuleActiveWithDependencies))
         {
             if (!moduleData.disableUI)
             {
@@ -309,7 +310,7 @@ public class TutorialModuleManager : MonoBehaviour
     private static Dictionary<string, string> CheckHelperScripts(Dictionary<TutorialType, TutorialModuleData> tutorialModules)
     {
         var result = new Dictionary<string, string>();
-        foreach (var module in tutorialModules.Values.Where(module => module.additionalScripts && module.isActive))
+        foreach (var module in tutorialModules.Values.Where(module => module.additionalScripts && IsModuleActiveWithDependencies(module)))
         {
             if (module.isStarterActive)
             {
@@ -340,6 +341,34 @@ public class TutorialModuleManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    private static bool IsModuleActiveWithDependencies(TutorialModuleData moduleData)
+    {
+        return IsModuleActiveWithDependencies(moduleData, new HashSet<TutorialModuleData>());
+    }
+
+    private static bool IsModuleActiveWithDependencies(
+        TutorialModuleData moduleData,
+        HashSet<TutorialModuleData> visitedModules)
+    {
+        if (moduleData == null || !moduleData.isActive)
+        {
+            return false;
+        }
+
+        if (!visitedModules.Add(moduleData))
+        {
+            return true;
+        }
+
+        if (moduleData.moduleDependencies == null)
+        {
+            return true;
+        }
+
+        return moduleData.moduleDependencies.All(dependency =>
+            IsModuleActiveWithDependencies(dependency, visitedModules));
     }
     
     /// <summary>
